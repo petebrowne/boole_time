@@ -2,6 +2,7 @@ require 'rubygems'
 require 'bundler/setup'
 require 'active_record'
 require 'boole_time'
+require 'timecop'
 
 ActiveRecord::Base.extend BooleTime
 ActiveRecord::Base.establish_connection :adapter => 'sqlite3', :database => ':memory:'
@@ -14,4 +15,10 @@ end
 
 class Post < ActiveRecord::Base
   boole_time :published_at
+end
+
+RSpec.configure do |config|
+  config.before(:all) do
+    Timecop.freeze
+  end
 end
