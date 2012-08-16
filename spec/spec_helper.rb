@@ -4,7 +4,6 @@ require 'active_record'
 require 'boole_time'
 require 'timecop'
 
-ActiveRecord::Base.extend BooleTime
 ActiveRecord::Base.establish_connection :adapter => 'sqlite3', :database => ':memory:'
 ActiveRecord::Migration.verbose = false
 ActiveRecord::Schema.define(:version => 1) do

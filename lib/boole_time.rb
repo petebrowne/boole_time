@@ -26,20 +26,21 @@ module BooleTime
     mixin   = generated_feature_methods
 
     fields.each do |field|
-      name         = options[:name] || field.to_s.sub(/_(at|on)\z/, '')
-      negative     = options[:negative] || "un#{name}"
-      truthy_scope = options[:truthy_scope] || name
-      falsy_scope  = options[:falsy_scope] || negative
+      name        = options[:name]        || field.to_s.sub(/_(at|on)\z/, '')
+      negative    = options[:negative]    || "un#{name}"
+      true_scope  = options[:true_scope]  || name
+      false_scope = options[:false_scope] || negative
 
       # Define truthy scope
-      scope(truthy_scope, Proc.new {
+      scope(true_scope, Proc.new {
         where(arel_table[field].lt(Time.now))
-      }) unless options[:truthy_scope] == false
+      }) unless options[:true_scope] == false
 
       # Define falsy scope
-      scope(falsy_scope, Proc.new {
-        where(arel_table[field].eq(nil).or(arel_table[field].gt(Time.now)))
-      }) unless options[:falsy_scope] == false
+      scope(false_scope, Proc.new {
+        field_attr = arel_table[field]
+        where(field_attr.eq(nil).or(field_attr.gt(Time.now)))
+      }) unless options[:false_scope] == false
 
       # Define writer method
       mixin.redefine_method(:"#{name}=") do |value|
@@ -67,7 +68,7 @@ module BooleTime
 end
 
 if defined?(ActiveRecord)
-  ActiveRecord.extend BooleTime
+  ActiveRecord::Base.extend BooleTime
 elsif defined?(Rails)
   require 'boole_time/railtie'
 end
