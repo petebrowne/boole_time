@@ -1,7 +1,7 @@
 # BooleTime
 
 ActiveRecord plugin for creating a boolean virtual attribute and scopes from
-a date or date_time column.
+a date or datetime column.
 
 ## Getting Started
 

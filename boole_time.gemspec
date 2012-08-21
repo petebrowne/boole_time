@@ -4,9 +4,11 @@ require File.expand_path('../lib/boole_time/version', __FILE__)
 Gem::Specification.new do |gem|
   gem.authors       = ['Pete Browne']
   gem.email         = ['me@petebrowne.com']
-  gem.description   = %q{TODO: Write a gem description}
-  gem.summary       = %q{TODO: Write a gem summary}
-  gem.homepage      = ''
+  gem.description   = %q{ActiveRecord plugin for creating a boolean virtual attribute from
+a datetime column.}
+  gem.summary       = %q{ActiveRecord plugin for creating a boolean virtual attribute and scopes from
+a date or datetime column.}
+  gem.homepage      = 'http://github.com/petebrowne/boole_time'
 
   gem.files         = `git ls-files`.split($\)
   gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
