@@ -1,29 +1,37 @@
 # BooleTime
 
-TODO: Write a gem description
+ActiveRecord plugin for creating a boolean virtual attribute and scopes from
+a date or date_time column.
 
-## Installation
+## Getting Started
 
-Add this line to your application's Gemfile:
+``` ruby
+# Gemfile
+gem 'boole_time'
+```
 
-    gem 'boole_time'
+``` bash
+$ bundle install
+$ rails generate model Post published_at:datetime
+# Or any model with a datetime column
+```
 
-And then execute:
+```ruby
+# app/models/post.rb
+class Post < ActiveRecord::Base
+  boole_time :published_at
+end
 
-    $ bundle
+# elsewhere
+post = Post.new
+post.published = true
+post.published_at
+# => (Time.now)
+post.published = false
+post.published_at
+# => nil
+```
 
-Or install it yourself as:
+## Copyright
 
-    $ gem install boole_time
-
-## Usage
-
-TODO: Write usage instructions here
-
-## Contributing
-
-1. Fork it
-2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Commit your changes (`git commit -am 'Added some feature'`)
-4. Push to the branch (`git push origin my-new-feature`)
-5. Create new Pull Request
+Copyright (c) 2012 [Pete Browne](http://petebrowne.com). See LICENSE for details.
