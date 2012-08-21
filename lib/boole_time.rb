@@ -31,23 +31,25 @@ module BooleTime
       true_scope  = options[:true_scope]  || name
       false_scope = options[:false_scope] || negative
 
-      # Define truthy scope
-      scope(true_scope, Proc.new {
-        where(arel_table[field].lt(Time.now))
-      }) unless options[:true_scope] == false
+      unless options[:scopes] == false
+        # Define truthy scope
+        scope(true_scope, Proc.new {
+          where(arel_table[field].lt(Time.now))
+        }) unless options[:true_scope] == false
 
-      # Define falsy scope
-      scope(false_scope, Proc.new {
-        field_attr = arel_table[field]
-        where(field_attr.eq(nil).or(field_attr.gt(Time.now)))
-      }) unless options[:false_scope] == false
+        # Define falsy scope
+        scope(false_scope, Proc.new {
+          field_attr = arel_table[field]
+          where(field_attr.eq(nil).or(field_attr.gt(Time.now)))
+        }) unless options[:false_scope] == false
+      end
 
       # Define writer method
       mixin.redefine_method(:"#{name}=") do |value|
         if TRUE_VALUES.include?(value)
-          __send__(:"#{field}=", Time.now) if __send__(field).nil?
+          __send__(:"#{field}=", Time.now) unless __send__(name)
         else
-          __send__(:"#{field}=", nil)
+          __send__(:"#{field}=", nil) if __send__(name)
         end
       end
 

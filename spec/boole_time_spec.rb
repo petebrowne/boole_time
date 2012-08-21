@@ -1,113 +1,106 @@
 require 'spec_helper'
 
 describe BooleTime do
-  describe 'reader method' do
-    it 'returns false if the time is nil' do
-      expect(Post.new.published).to eql(false)
+  context 'when the time is nil' do
+    subject(:post) { Post.new published_at: nil }
+
+    its(:published)    { should be_false }
+    its(:published?)   { should be_false }
+    its(:unpublished)  { should be_true }
+    its(:unpublished?) { should be_true }
+
+    context 'when set to true' do
+      before { post.published = true }
+      its(:published_at) { should eq(Time.now) }
     end
 
-    it 'returns false if the time is in the future' do
-      post = Post.new published_at: 2.weeks.from_now
-      expect(post.published).to eql(false)
-    end
-
-    it 'returns true if the time is in the past' do
-      post = Post.new published_at: 2.weeks.ago
-      expect(post.published).to eql(true)
-    end
-  end
-
-  describe 'negative reader method' do
-    it 'returns true if the time is nil' do
-      expect(Post.new.unpublished).to eql(true)
-    end
-
-    it 'returns true if the time is in the future' do
-      post = Post.new published_at: 2.weeks.from_now
-      expect(post.unpublished).to eql(true)
-    end
-
-    it 'returns false if the time is in the past' do
-      post = Post.new published_at: 2.weeks.ago
-      expect(post.unpublished).to eql(false)
+    context 'when set to false' do
+      before { post.published = false }
+      its(:published_at) { should be_nil }
     end
   end
 
-  describe 'query method' do
-    it 'returns false if the time is nil' do
-      expect(Post.new.published?).to eql(false)
+  context 'when the time is in the future' do
+    subject(:post) { Post.new published_at: 2.weeks.from_now }
+
+    its(:published)    { should be_false }
+    its(:published?)   { should be_false }
+    its(:unpublished)  { should be_true }
+    its(:unpublished?) { should be_true }
+
+    context 'when set to true' do
+      before { post.published = true }
+      its(:published_at) { should eq(Time.now) }
     end
 
-    it 'returns false if the time is in the future' do
-      post = Post.new published_at: 2.weeks.from_now
-      expect(post.published?).to eql(false)
-    end
-
-    it 'returns true if the time is in the past' do
-      post = Post.new published_at: 2.weeks.ago
-      expect(post.published?).to eql(true)
-    end
-  end
-
-  describe 'negative query method' do
-    it 'returns true if the time is nil' do
-      expect(Post.new.unpublished?).to eql(true)
-    end
-
-    it 'returns true if the time is in the future' do
-      post = Post.new published_at: 2.weeks.from_now
-      expect(post.unpublished?).to eql(true)
-    end
-
-    it 'returns false if the time is in the past' do
-      post = Post.new published_at: 2.weeks.ago
-      expect(post.unpublished?).to eql(false)
+    context 'when set to false' do
+      before { post.published = false }
+      its(:published_at) { should eq(2.weeks.from_now) }
     end
   end
 
-  describe 'writer method' do
-    it 'updates the time when set to true' do
-      post = Post.new
-      post.published = true
-      expect(post.published_at).to eq(Time.now)
+  context 'when the time is in the past' do
+    subject(:post) { Post.new published_at: 2.weeks.ago }
+
+    its(:published)    { should be_true }
+    its(:published?)   { should be_true }
+    its(:unpublished)  { should be_false }
+    its(:unpublished?) { should be_false }
+
+    context 'when set to true' do
+      before { post.published = true }
+      its(:published_at) { should eq(2.weeks.ago) }
     end
 
-    it 'sets the time to nil when set to false' do
-      post = Post.new published_at: 2.weeks.ago
-      post.published = false
-      expect(post.published_at).to be_nil
-    end
-
-    it 'does not the set the time when already set' do
-      post = Post.new published_at: 2.weeks.ago
-      post.published = true
-      expect(post.published_at).to eq(2.weeks.ago)
+    context 'when set to false' do
+      before { post.published = false }
+      its(:published_at) { should be_nil }
     end
   end
 
-  describe 'truthy_scope' do
-    it 'returns records with times in the past' do
-      post_1 = Post.create published_at: nil
-      post_2 = Post.create published_at: 2.weeks.ago
-      post_3 = Post.create published_at: 2.weeks.from_now
-      posts  = Post.published
+  context 'with various times' do
+    subject { Post }
 
-      expect(posts).to match_array([post_2])
+    before do
+      @post_1 = Post.create published_at: nil
+      @post_2 = Post.create published_at: 2.weeks.ago
+      @post_3 = Post.create published_at: 2.weeks.from_now
     end
 
     after { Post.delete_all }
+
+    its(:published)   { should match_array([@post_2]) }
+    its(:unpublished) { should match_array([@post_1, @post_3]) }
   end
 
-  describe 'falsy_scope' do
-    it 'returns records without set times' do
-      post_1 = Post.create published_at: nil
-      post_2 = Post.create published_at: 2.weeks.ago
-      post_3 = Post.create published_at: 2.weeks.from_now
-      posts  = Post.unpublished
+  context 'without scopes' do
+    subject { Post }
+    it { should_not respond_to(:subscribed) }
+    it { should_not respond_to(:unsubscribed) }
+  end
 
-      expect(posts).to match_array([post_1, post_3])
-    end
+  context 'without negatives' do
+    subject { Post.new }
+    it { should_not respond_to(:unsubscribed) }
+    it { should_not respond_to(:unsubscribed?) }
+  end
 
-    after { Post.delete_all }
+  context 'with a custom name' do
+    subject { Post.new }
+    it { should respond_to(:trashed=) }
+    it { should respond_to(:trashed) }
+    it { should respond_to(:trashed?) }
+  end
+
+  context 'with a custom negative name' do
+    subject { Post.new }
+    it { should respond_to(:treasured) }
+    it { should respond_to(:treasured?) }
+  end
+
+  context 'with custom scope names' do
+    subject { Post }
+    it { should respond_to(:with_comments_open) }
+    it { should respond_to(:with_comments_closed) }
   end
 end
