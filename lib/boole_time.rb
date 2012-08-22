@@ -1,3 +1,4 @@
+require 'active_record'
 require 'boole_time/version'
 
 module BooleTime
@@ -69,8 +70,4 @@ module BooleTime
   end
 end
 
-if defined?(ActiveRecord)
-  ActiveRecord::Base.extend BooleTime
-elsif defined?(Rails)
-  require 'boole_time/railtie'
-end
+ActiveRecord::Base.extend BooleTime

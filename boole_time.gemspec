@@ -17,8 +17,8 @@ a date or datetime column.}
   gem.require_paths = ['lib']
   gem.version       = BooleTime::VERSION
 
+  gem.add_dependency             'activerecord', '~> 3.2'
   gem.add_development_dependency 'rspec',        '~> 2.11'
   gem.add_development_dependency 'timecop',      '~> 0.4'
-  gem.add_development_dependency 'activerecord', '~> 3.2'
   gem.add_development_dependency 'sqlite3',      '~> 1.3'
 end
